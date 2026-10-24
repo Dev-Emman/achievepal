@@ -51,7 +51,7 @@ function toAssignment(row: AssignmentRow): Assignment {
 }
 
 // Log the technical details for us, show the user a friendly message
-function fail(error: unknown, friendly: string): never {
+export function fail(error: unknown, friendly: string): never {
   console.error(error)
   throw new Error(friendly)
 }
