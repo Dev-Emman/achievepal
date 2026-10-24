@@ -8,6 +8,7 @@ import AuthPage from './pages/AuthPage'
 import Dashboard from './pages/Dashboard'
 import Assignments from './pages/Assignments'
 import Modules from './pages/Modules'
+import Grades from './pages/Grades'
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
                 <Route path="/modules" element={<Modules />} />
                 <Route path="/assignments" element={<Assignments />} />
                 <Route path="/calendar" element={<PlaceholderPage title="Calendar" />} />
-                <Route path="/grades" element={<PlaceholderPage title="Grades" />} />
+                <Route path="/grades" element={<Grades />} />
                 <Route path="*" element={<PlaceholderPage title="Page not found" />} />
               </Route>
             </Route>

@@ -355,3 +355,43 @@ select:focus {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+.grade-panel {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.assessment-list {
+  list-style: none;
+}
+
+.assessment-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.assessment-row:last-child {
+  border-bottom: none;
+}
+
+.assessment-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.assessment-mark {
+  font-weight: 600;
+}
+
+.assessment-form {
+  display: grid;
+  gap: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-4);
+}
+
+.assessment-form h3 {
+  font-size: 1rem;
+}

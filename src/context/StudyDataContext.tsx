@@ -52,8 +52,6 @@ export function StudyDataProvider() {
         setModules(loadedModules)
         setAssignments(loadedAssignments)
         setAssessments(loadedAssessments)
-        // TEMPORARY: delete this line after the check
-        console.log('Assessments loaded:', loadedAssessments.length)
       })
       .catch((e: Error) => {
         if (!cancelled) setError(e.message)
