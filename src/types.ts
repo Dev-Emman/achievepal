@@ -21,3 +21,12 @@ export type Assignment = {
 }
 
 export type NewAssignment = Omit<Assignment, 'id' | 'moduleCode' | 'completed'>
+export type Assessment = {
+  id: string
+  moduleId: string
+  name: string
+  weight: number // percentage of the module, 0 to 100
+  mark: number | null // null until the mark is known
+}
+
+export type NewAssessment = Omit<Assessment, 'id'>
