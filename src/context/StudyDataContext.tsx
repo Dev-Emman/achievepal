@@ -2,16 +2,28 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 import * as api from '../lib/api'
-import type { Assignment, Module, NewAssignment, NewModule } from '../types'
+import * as assessmentsApi from '../lib/assessmentsApi'
+import type {
+  Assessment,
+  Assignment,
+  Module,
+  NewAssessment,
+  NewAssignment,
+  NewModule,
+} from '../types'
 
 type StudyData = {
   modules: Module[]
   assignments: Assignment[]
+  assessments: Assessment[]
   addModule: (data: NewModule) => Promise<void>
   deleteModule: (id: string) => Promise<void>
   addAssignment: (data: NewAssignment) => Promise<void>
   toggleAssignment: (id: string) => Promise<void>
   deleteAssignment: (id: string) => Promise<void>
+  addAssessment: (data: NewAssessment) => Promise<void>
+  setAssessmentMark: (id: string, mark: number | null) => Promise<void>
+  deleteAssessment: (id: string) => Promise<void>
 }
 
 const StudyDataContext = createContext<StudyData | null>(null)
@@ -22,6 +34,7 @@ export function StudyDataProvider() {
 
   const [modules, setModules] = useState<Module[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [assessments, setAssessments] = useState<Assessment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -29,11 +42,18 @@ export function StudyDataProvider() {
     if (!userId) return
     let cancelled = false
 
-    Promise.all([api.fetchModules(), api.fetchAssignments()])
-      .then(([loadedModules, loadedAssignments]) => {
+    Promise.all([
+      api.fetchModules(),
+      api.fetchAssignments(),
+      assessmentsApi.fetchAssessments(),
+    ])
+      .then(([loadedModules, loadedAssignments, loadedAssessments]) => {
         if (cancelled) return
         setModules(loadedModules)
         setAssignments(loadedAssignments)
+        setAssessments(loadedAssessments)
+        // TEMPORARY: delete this line after the check
+        console.log('Assessments loaded:', loadedAssessments.length)
       })
       .catch((e: Error) => {
         if (!cancelled) setError(e.message)
@@ -47,7 +67,7 @@ export function StudyDataProvider() {
     }
   }, [userId])
 
-  // Add actions throw on failure so the form can show the message under the field
+  // "Add" and "set mark" throw on failure so the form can show the message next to the field
   async function addModule(data: NewModule) {
     const created = await api.insertModule(data)
     setModules((prev) => [...prev, created])
@@ -58,12 +78,25 @@ export function StudyDataProvider() {
     setAssignments((prev) => [...prev, created])
   }
 
-  // Toggle and delete actions show failures in the banner instead
+  async function addAssessment(data: NewAssessment) {
+    const created = await assessmentsApi.insertAssessment(data)
+    setAssessments((prev) => [...prev, created])
+  }
+
+  async function setAssessmentMark(id: string, mark: number | null) {
+    await assessmentsApi.updateAssessmentMark(id, mark)
+    setAssessments((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, mark } : a))
+    )
+  }
+
+  // Delete and toggle actions show failures in the banner instead
   async function deleteModule(id: string) {
     try {
       await api.deleteModuleById(id)
       setModules((prev) => prev.filter((m) => m.id !== id))
       setAssignments((prev) => prev.filter((a) => a.moduleId !== id))
+      setAssessments((prev) => prev.filter((a) => a.moduleId !== id))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong.')
     }
@@ -92,6 +125,15 @@ export function StudyDataProvider() {
     }
   }
 
+  async function deleteAssessment(id: string) {
+    try {
+      await assessmentsApi.deleteAssessmentById(id)
+      setAssessments((prev) => prev.filter((a) => a.id !== id))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.')
+    }
+  }
+
   if (loading) {
     return <p className="empty">Loading your data...</p>
   }
@@ -101,11 +143,15 @@ export function StudyDataProvider() {
       value={{
         modules,
         assignments,
+        assessments,
         addModule,
         deleteModule,
         addAssignment,
         toggleAssignment,
         deleteAssignment,
+        addAssessment,
+        setAssessmentMark,
+        deleteAssessment,
       }}
     >
       {error && (
