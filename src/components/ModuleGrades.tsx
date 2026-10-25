@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import MarkInput from './MarkInput'
 import { useStudyData } from '../context/StudyDataContext'
 import { summarise, requiredMark, round1, ceilTo1 } from '../lib/grades'
 import type { TargetResult } from '../lib/grades'
@@ -40,7 +41,8 @@ type ModuleGradesProps = {
 }
 
 function ModuleGrades({ mod }: ModuleGradesProps) {
-  const { assessments, addAssessment, deleteAssessment } = useStudyData()
+  const { assessments, addAssessment, setAssessmentMark, deleteAssessment } =
+    useStudyData()
 
   const [target, setTarget] = useState('70')
   const [name, setName] = useState('')
@@ -196,9 +198,11 @@ function ModuleGrades({ mod }: ModuleGradesProps) {
                 <p className="deadline-title">{a.name}</p>
                 <p className="deadline-meta">{round1(a.weight)}% of module</p>
               </div>
-              <span className="assessment-mark">
-                {a.mark === null ? 'Not marked yet' : `${round1(a.mark)}%`}
-              </span>
+              <MarkInput
+                value={a.mark}
+                label={`Mark for ${a.name}`}
+                onSave={(m) => setAssessmentMark(a.id, m)}
+              />
               <button
                 className="icon-btn"
                 onClick={() => handleDelete(a)}

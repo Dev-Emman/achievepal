@@ -423,3 +423,11 @@ select:focus {
 .result-info { background: var(--color-primary-soft); color: var(--color-primary); }
 .result-bad { background: #fee2e2; color: var(--color-danger); }
 .result-warn { background: #fef3c7; color: var(--color-warning); }
+.mark-field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.mark-input {
+  width: 90px;
+}
