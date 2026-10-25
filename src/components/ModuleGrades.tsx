@@ -1,8 +1,39 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useStudyData } from '../context/StudyDataContext'
-import { summarise, round1 } from '../lib/grades'
+import { summarise, requiredMark, round1, ceilTo1 } from '../lib/grades'
+import type { TargetResult } from '../lib/grades'
 import type { Assessment, Module } from '../types'
+
+function describe(result: TargetResult, target: number, remaining: number) {
+  switch (result.kind) {
+    case 'achieved':
+      return {
+        tone: 'result-good',
+        text: `You've already secured ${target}%. Even 0% on the rest would get you there.`,
+      }
+    case 'needed':
+      return {
+        tone: 'result-info',
+        text: `You need ${ceilTo1(result.required)}% on the remaining ${round1(remaining)}% to reach ${target}%.`,
+      }
+    case 'impossible':
+      return {
+        tone: 'result-bad',
+        text: `${target}% is out of reach. Even 100% on the rest gives ${round1(result.bestPossible)}%.`,
+      }
+    case 'final':
+      return result.met
+        ? {
+            tone: 'result-good',
+            text: `Final mark: ${round1(result.final)}%. Target reached.`,
+          }
+        : {
+            tone: 'result-warn',
+            text: `Final mark: ${round1(result.final)}%, below your ${target}% target.`,
+          }
+  }
+}
 
 type ModuleGradesProps = {
   mod: Module
@@ -11,6 +42,7 @@ type ModuleGradesProps = {
 function ModuleGrades({ mod }: ModuleGradesProps) {
   const { assessments, addAssessment, deleteAssessment } = useStudyData()
 
+  const [target, setTarget] = useState('70')
   const [name, setName] = useState('')
   const [weight, setWeight] = useState('')
   const [mark, setMark] = useState('')
@@ -19,6 +51,24 @@ function ModuleGrades({ mod }: ModuleGradesProps) {
 
   const mine = assessments.filter((a) => a.moduleId === mod.id)
   const summary = summarise(mine)
+
+  const targetNumber = Number(target)
+  const targetValid =
+    target.trim() !== '' &&
+    Number.isFinite(targetNumber) &&
+    targetNumber >= 0 &&
+    targetNumber <= 100
+
+  const outcome = targetValid
+    ? describe(
+        requiredMark(summary.points, summary.remainingWeight, targetNumber),
+        targetNumber,
+        summary.remainingWeight
+      )
+    : null
+
+  const weightsOff =
+    mine.length > 0 && Math.abs(summary.totalWeight - 100) > 0.001
 
   async function handleAdd(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -84,10 +134,57 @@ function ModuleGrades({ mod }: ModuleGradesProps) {
       <div>
         <h2 className="module-code">{mod.code}</h2>
         <p className="module-name">{mod.name}</p>
-        <p className="deadline-meta">
-          Weights added so far: {round1(summary.totalWeight)}% of 100%
-        </p>
       </div>
+
+      <div className="grade-summary">
+        <div>
+          <p className="stat-label">Current average</p>
+          <p className="grade-big">
+            {summary.average === null ? '—' : `${round1(summary.average)}%`}
+          </p>
+        </div>
+        <div>
+          <p className="stat-label">Points banked</p>
+          <p className="grade-big">
+            {round1(summary.points)}{' '}
+            <span className="deadline-meta">/ {round1(summary.markedWeight)}</span>
+          </p>
+        </div>
+        <label className="field">
+          Target (%)
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            max={100}
+            step="any"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+          />
+        </label>
+      </div>
+
+      {!targetValid && (
+        <p className="form-error" role="alert">
+          Enter a target between 0 and 100.
+        </p>
+      )}
+      {targetValid && mine.length === 0 && (
+        <p className="deadline-meta">
+          Add your assessments below to see what you need.
+        </p>
+      )}
+      {outcome && mine.length > 0 && (
+        <p className={`result ${outcome.tone}`} role="status">
+          {outcome.text}
+        </p>
+      )}
+      {weightsOff && (
+        <p className="result result-warn" role="status">
+          Your weights add up to {round1(summary.totalWeight)}%. They should total
+          100% for the module.
+        </p>
+      )}
 
       {mine.length === 0 ? (
         <p className="empty">No assessments yet. Add the first one below.</p>

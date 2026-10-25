@@ -395,3 +395,31 @@ select:focus {
 .assessment-form h3 {
   font-size: 1rem;
 }
+.grade-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+@media (min-width: 768px) {
+  .grade-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.grade-big {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.result {
+  padding: var(--space-3);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.result-good { background: #dcfce7; color: var(--color-success); }
+.result-info { background: var(--color-primary-soft); color: var(--color-primary); }
+.result-bad { background: #fee2e2; color: var(--color-danger); }
+.result-warn { background: #fef3c7; color: var(--color-warning); }
