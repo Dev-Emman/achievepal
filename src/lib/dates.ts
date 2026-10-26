@@ -37,3 +37,10 @@ export function greeting(now: Date = new Date()): string {
   if (hour < 18) return 'Good afternoon'
   return 'Good evening'
 }
+export function formatDate(iso: string): string {
+  return parseIso(iso).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}

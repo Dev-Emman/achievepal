@@ -1,29 +1,41 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Plus } from 'lucide-react'
 import AssignmentForm from '../components/AssignmentForm'
-import DeadlineList from '../components/DeadlineList'
+import AssignmentList from '../components/AssignmentList'
 import { useStudyData } from '../context/StudyDataContext'
+import {
+  priorityLabels,
+  priorityOrder,
+  statusLabels,
+  statusOrder,
+} from '../lib/labels'
+import type { Priority, Status } from '../types'
 
-type Filter = 'all' | 'pending' | 'completed'
 type SortBy = 'deadline' | 'priority'
 
-const priorityOrder = { high: 0, medium: 1, low: 2 }
-
 function Assignments() {
-  const { modules, assignments, toggleAssignment, addAssignment, deleteAssignment } =
-    useStudyData()
+  const {
+    modules,
+    assignments,
+    addAssignment,
+    setAssignmentStatus,
+    deleteAssignment,
+  } = useStudyData()
 
+  const [showForm, setShowForm] = useState(false)
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<Filter>('all')
+  const [moduleFilter, setModuleFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | Status>('all')
+  const [priorityFilter, setPriorityFilter] = useState<'all' | Priority>('all')
   const [sortBy, setSortBy] = useState<SortBy>('deadline')
 
   const query = search.trim().toLowerCase()
 
   const visible = assignments
-    .filter((a) => {
-      if (filter === 'pending') return !a.completed
-      if (filter === 'completed') return a.completed
-      return true
-    })
+    .filter((a) => moduleFilter === 'all' || a.moduleId === moduleFilter)
+    .filter((a) => statusFilter === 'all' || a.status === statusFilter)
+    .filter((a) => priorityFilter === 'all' || a.priority === priorityFilter)
     .filter(
       (a) =>
         a.title.toLowerCase().includes(query) ||
@@ -32,7 +44,7 @@ function Assignments() {
     .sort((a, b) =>
       sortBy === 'deadline'
         ? a.deadline.localeCompare(b.deadline)
-        : priorityOrder[a.priority] - priorityOrder[b.priority]
+        : priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority)
     )
 
   function handleDelete(id: string) {
@@ -44,33 +56,109 @@ function Assignments() {
 
   return (
     <div className="dashboard">
-      <AssignmentForm modules={modules} onAdd={addAssignment} />
-
       <div className="toolbar">
         <input
           className="toolbar-search"
           type="search"
-          placeholder="Search title or module"
+          placeholder="Search assignments"
+          aria-label="Search assignments"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select value={filter} onChange={(e) => setFilter(e.target.value as Filter)}>
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
-          <option value="completed">Completed</option>
+        <select
+          value={moduleFilter}
+          onChange={(e) => setModuleFilter(e.target.value)}
+          aria-label="Filter by module"
+        >
+          <option value="all">All modules</option>
+          {modules.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.code}
+            </option>
+          ))}
         </select>
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)}>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as 'all' | Status)}
+          aria-label="Filter by status"
+        >
+          <option value="all">All statuses</option>
+          {statusOrder.map((s) => (
+            <option key={s} value={s}>
+              {statusLabels[s]}
+            </option>
+          ))}
+        </select>
+        <select
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value as 'all' | Priority)}
+          aria-label="Filter by priority"
+        >
+          <option value="all">All priorities</option>
+          {priorityOrder.map((p) => (
+            <option key={p} value={p}>
+              {priorityLabels[p]}
+            </option>
+          ))}
+        </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as SortBy)}
+          aria-label="Sort assignments"
+        >
           <option value="deadline">Sort by deadline</option>
           <option value="priority">Sort by priority</option>
         </select>
+        <button
+          className="btn-primary btn-with-icon"
+          onClick={() => setShowForm(!showForm)}
+          aria-expanded={showForm}
+        >
+          <Plus size={18} aria-hidden="true" />
+          Add assignment
+        </button>
       </div>
 
-      <DeadlineList
-        title={`Assignments (${visible.length})`}
-        assignments={visible}
-        onToggle={toggleAssignment}
-        onDelete={handleDelete}
-      />
+      {showForm && (
+        <AssignmentForm
+          modules={modules}
+          onAdd={async (data) => {
+            await addAssignment(data)
+            setShowForm(false)
+          }}
+        />
+      )}
+
+      {assignments.length === 0 ? (
+        <div className="card">
+          <p className="empty">
+            No assignments yet.{' '}
+            {modules.length === 0 ? (
+              <>
+                <Link to="/modules" className="card-link">Add a module</Link> first, then
+                add your first assignment.
+              </>
+            ) : (
+              'Add your first one to start tracking deadlines.'
+            )}
+          </p>
+        </div>
+      ) : visible.length === 0 ? (
+        <div className="card">
+          <p className="empty">No assignments match your filters.</p>
+        </div>
+      ) : (
+        <>
+          <p className="result-count">
+            Showing {visible.length} of {assignments.length}
+          </p>
+          <AssignmentList
+            assignments={visible}
+            onStatusChange={setAssignmentStatus}
+            onDelete={handleDelete}
+          />
+        </>
+      )}
     </div>
   )
 }
