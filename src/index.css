@@ -738,3 +738,106 @@ select:focus {
     color: var(--color-text-muted);
   }
 }
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mod-card {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.mod-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mod-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+}
+
+.mod-icon.tone-lavender { background: #d9d3ff; color: #5b3fd6; }
+.mod-icon.tone-mint { background: #bfead7; color: #15803d; }
+.mod-icon.tone-peach { background: #ffd2ac; color: #b45309; }
+.mod-icon.tone-sky { background: #c4e2ff; color: #1d5fb4; }
+
+.mod-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.mod-name {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.mod-code {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.mod-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.mod-avg {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.mod-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.ring {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ring svg {
+  display: block;
+}
+
+.ring-track {
+  stroke: var(--color-border);
+}
+
+.ring-bar {
+  stroke: var(--color-primary);
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.ring-good .ring-bar { stroke: var(--color-success); }
+.ring-low .ring-bar { stroke: var(--color-warning); }
+
+.ring-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-bar {
+    transition: none;
+  }
+}
