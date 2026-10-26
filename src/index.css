@@ -1,15 +1,35 @@
 :root {
-  /* Colours */
-  --color-primary: #4f46e5;
-  --color-primary-soft: #eef2ff;
-  --color-bg: #f8fafc;
+  /* Brand */
+  --color-primary: #2f5bea;
+  --color-primary-hover: #2549c4;
+  --color-primary-soft: #eaf0ff;
+  --brand-cyan: #00b4ff;
+  --brand-violet: #7c3aed;
+
+  /* Dark navy (sidebar and hero cards) */
+  --navy-900: #0a1233;
+  --navy-800: #101b45;
+  --navy-700: #1a2a62;
+  --on-navy: #ffffff;
+  --on-navy-muted: #a9b4d6;
+
+  /* Surfaces and text */
+  --color-bg: #f5f7fc;
   --color-surface: #ffffff;
-  --color-text: #0f172a;
-  --color-text-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-success: #16a34a;
-  --color-warning: #d97706;
+  --color-text: #0f1b3d;
+  --color-text-muted: #5b6785;
+  --color-border: #e3e8f4;
+
+  /* Status colours (darkened a little so text on tinted badges is readable) */
+  --color-success: #15803d;
+  --color-warning: #b45309;
   --color-danger: #dc2626;
+
+  /* Pastel tints for the stat cards */
+  --tint-lavender: #ece9ff;
+  --tint-mint: #dcf5e9;
+  --tint-peach: #ffe9d6;
+  --tint-sky: #e0f0ff;
 
   /* Spacing scale */
   --space-1: 4px;
@@ -20,8 +40,12 @@
   --space-8: 32px;
 
   /* Shape and shadow */
-  --radius: 12px;
-  --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(16, 27, 69, 0.06), 0 4px 16px rgba(16, 27, 69, 0.04);
+
+  /* Type */
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 * {
@@ -31,9 +55,17 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
   background: var(--color-bg);
   color: var(--color-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Clear keyboard focus everywhere (good for accessibility) */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* Reusable card, used all over the app */
