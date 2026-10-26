@@ -6,6 +6,7 @@ import type {
   NewModule,
   Priority,
   Semester,
+  Status,
 } from '../types'
 
 type ModuleRow = {
@@ -21,13 +22,13 @@ type AssignmentRow = {
   title: string
   deadline: string
   priority: string
-  completed: boolean
+  status: string
   modules: { code: string } | null
 }
 
 const MODULE_COLUMNS = 'id, code, name, semester'
 const ASSIGNMENT_COLUMNS =
-  'id, module_id, title, deadline, priority, completed, modules(code)'
+  'id, module_id, title, deadline, priority, status, modules(code)'
 
 function toModule(row: ModuleRow): Module {
   return {
@@ -39,6 +40,7 @@ function toModule(row: ModuleRow): Module {
 }
 
 function toAssignment(row: AssignmentRow): Assignment {
+  const status = row.status as Status
   return {
     id: row.id,
     moduleId: row.module_id,
@@ -46,7 +48,8 @@ function toAssignment(row: AssignmentRow): Assignment {
     title: row.title,
     deadline: row.deadline,
     priority: row.priority as Priority,
-    completed: row.completed,
+    status,
+    completed: status === 'completed',
   }
 }
 
@@ -110,13 +113,14 @@ export async function insertAssignment(a: NewAssignment): Promise<Assignment> {
   return toAssignment(data as unknown as AssignmentRow)
 }
 
-export async function setAssignmentCompleted(
+export async function setAssignmentStatus(
   id: string,
-  completed: boolean
+  status: Status
 ): Promise<void> {
+  // The old "completed" column is kept in step until we remove it
   const { error } = await supabase
     .from('assignments')
-    .update({ completed })
+    .update({ status, completed: status === 'completed' })
     .eq('id', id)
   if (error) fail(error, 'Could not update the assignment. Please try again.')
 }

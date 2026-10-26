@@ -10,6 +10,7 @@ import type {
   NewAssessment,
   NewAssignment,
   NewModule,
+  Status,
 } from '../types'
 
 type StudyData = {
@@ -20,6 +21,7 @@ type StudyData = {
   deleteModule: (id: string) => Promise<void>
   addAssignment: (data: NewAssignment) => Promise<void>
   toggleAssignment: (id: string) => Promise<void>
+  setAssignmentStatus: (id: string, status: Status) => Promise<void>
   deleteAssignment: (id: string) => Promise<void>
   addAssessment: (data: NewAssessment) => Promise<void>
   setAssessmentMark: (id: string, mark: number | null) => Promise<void>
@@ -88,7 +90,7 @@ export function StudyDataProvider() {
     )
   }
 
-  // Delete and toggle actions show failures in the banner instead
+  // Delete and status actions show failures in the banner instead
   async function deleteModule(id: string) {
     try {
       await api.deleteModuleById(id)
@@ -100,18 +102,24 @@ export function StudyDataProvider() {
     }
   }
 
-  async function toggleAssignment(id: string) {
-    const target = assignments.find((a) => a.id === id)
-    if (!target) return
-    const completed = !target.completed
+  async function setAssignmentStatus(id: string, status: Status) {
     try {
-      await api.setAssignmentCompleted(id, completed)
+      await api.setAssignmentStatus(id, status)
       setAssignments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, completed } : a))
+        prev.map((a) =>
+          a.id === id ? { ...a, status, completed: status === 'completed' } : a
+        )
       )
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong.')
     }
+  }
+
+  // The checkbox: done becomes not started, anything else becomes done
+  async function toggleAssignment(id: string) {
+    const target = assignments.find((a) => a.id === id)
+    if (!target) return
+    await setAssignmentStatus(id, target.completed ? 'not_started' : 'completed')
   }
 
   async function deleteAssignment(id: string) {
@@ -146,6 +154,7 @@ export function StudyDataProvider() {
         deleteModule,
         addAssignment,
         toggleAssignment,
+        setAssignmentStatus,
         deleteAssignment,
         addAssessment,
         setAssessmentMark,

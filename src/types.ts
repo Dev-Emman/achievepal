@@ -1,4 +1,5 @@
 export type Priority = 'low' | 'medium' | 'high'
+export type Status = 'not_started' | 'in_progress' | 'completed'
 export type Semester = 1 | 2
 
 export type Module = {
@@ -17,10 +18,15 @@ export type Assignment = {
   title: string
   deadline: string // format: YYYY-MM-DD
   priority: Priority
-  completed: boolean
+  status: Status
+  completed: boolean // always equals (status === 'completed'), kept for convenience
 }
 
-export type NewAssignment = Omit<Assignment, 'id' | 'moduleCode' | 'completed'>
+export type NewAssignment = Omit<
+  Assignment,
+  'id' | 'moduleCode' | 'status' | 'completed'
+>
+
 export type Assessment = {
   id: string
   moduleId: string
