@@ -986,3 +986,121 @@ select:focus {
     display: none;
   }
 }
+.g-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 600px) {
+  .g-top {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.g-avg {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.g-target {
+  display: grid;
+  gap: var(--space-2);
+  align-content: center;
+}
+
+.target-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.target-input input {
+  width: 110px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.result-lg {
+  padding: var(--space-4);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.g-card {
+  padding: 0;
+}
+
+.g-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.g-head .section-title {
+  margin-bottom: 0;
+}
+
+.g-empty {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.g-card .assessment-form {
+  padding: var(--space-4);
+}
+
+/* Compact table on phones, roomier from 600px */
+.g-table th,
+.g-table td {
+  padding: var(--space-3) var(--space-2);
+}
+
+.g-table tr > :first-child {
+  padding-left: var(--space-4);
+}
+
+.g-table tr > :last-child {
+  padding-right: var(--space-4);
+}
+
+.g-table tfoot th,
+.g-table tfoot td {
+  font-weight: 700;
+  background: #fafbfe;
+  border-top: 1px solid var(--color-border);
+  border-bottom: none;
+}
+
+.weight-inline {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.col-weight {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .col-weight {
+    display: table-cell;
+  }
+
+  .weight-inline {
+    display: none;
+  }
+
+  .g-table th,
+  .g-table td {
+    padding: 14px var(--space-4);
+  }
+}
