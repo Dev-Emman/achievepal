@@ -62,7 +62,12 @@ function Layout() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const current = navItems.find((item) => item.to === location.pathname)
-  const initial = (user?.email ?? '?').charAt(0).toUpperCase()
+    const fullName =
+    typeof user?.user_metadata?.full_name === 'string'
+      ? user.user_metadata.full_name
+      : ''
+  const displayName = fullName || user?.email || ''
+  const initial = displayName.charAt(0).toUpperCase() || '?'
 
   // Let the Escape key close the phone menu
   useEffect(() => {
@@ -124,8 +129,8 @@ function Layout() {
           <span className="avatar" aria-hidden="true">
             {initial}
           </span>
-          <span className="user-email" title={user?.email}>
-            {user?.email}
+          <span className="user-email" title={displayName}>
+            {displayName}
           </span>
           <button
             className="logout-btn"
