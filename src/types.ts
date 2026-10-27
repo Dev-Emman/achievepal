@@ -44,3 +44,7 @@ export type StudySession = {
 }
 
 export type NewStudySession = Omit<StudySession, 'id'>
+export type Profile = {
+  weeklyGoalMinutes: number // 0 means no goal
+  defaultTarget: number // percentage, 0 to 100
+}

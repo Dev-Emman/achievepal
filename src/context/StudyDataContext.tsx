@@ -4,6 +4,8 @@ import { useAuth } from './AuthContext'
 import * as api from '../lib/api'
 import * as assessmentsApi from '../lib/assessmentsApi'
 import * as sessionsApi from '../lib/studySessionsApi'
+import * as profileApi from '../lib/profileApi'
+import { DEFAULT_PROFILE } from '../lib/profile'
 import type {
   Assessment,
   Assignment,
@@ -12,6 +14,7 @@ import type {
   NewAssignment,
   NewModule,
   NewStudySession,
+  Profile,
   Status,
   StudySession,
 } from '../types'
@@ -21,6 +24,7 @@ type StudyData = {
   assignments: Assignment[]
   assessments: Assessment[]
   sessions: StudySession[]
+  profile: Profile
   addModule: (data: NewModule) => Promise<void>
   deleteModule: (id: string) => Promise<void>
   addAssignment: (data: NewAssignment) => Promise<void>
@@ -32,6 +36,7 @@ type StudyData = {
   deleteAssessment: (id: string) => Promise<void>
   addSession: (data: NewStudySession) => Promise<void>
   deleteSession: (id: string) => Promise<void>
+  saveProfile: (data: Profile) => Promise<void>
 }
 
 const StudyDataContext = createContext<StudyData | null>(null)
@@ -44,6 +49,7 @@ export function StudyDataProvider() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [assessments, setAssessments] = useState<Assessment[]>([])
   const [sessions, setSessions] = useState<StudySession[]>([])
+  const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -56,6 +62,7 @@ export function StudyDataProvider() {
       api.fetchAssignments(),
       assessmentsApi.fetchAssessments(),
       sessionsApi.fetchSessions(),
+      profileApi.fetchProfile(),
     ])
       .then(
         ([
@@ -63,12 +70,16 @@ export function StudyDataProvider() {
           loadedAssignments,
           loadedAssessments,
           loadedSessions,
+          loadedProfile,
         ]) => {
           if (cancelled) return
           setModules(loadedModules)
           setAssignments(loadedAssignments)
           setAssessments(loadedAssessments)
           setSessions(loadedSessions)
+          setProfile(loadedProfile)
+          // TEMPORARY: delete this line after the check
+          console.log('Profile loaded:', loadedProfile)
         }
       )
       .catch((e: Error) => {
@@ -83,7 +94,7 @@ export function StudyDataProvider() {
     }
   }, [userId])
 
-  // "Add" and "set mark" throw on failure so the form can show the message next to the field
+  // "Add", "save" and "set mark" throw on failure so the form can show the message next to the field
   async function addModule(data: NewModule) {
     const created = await api.insertModule(data)
     setModules((prev) => [...prev, created])
@@ -110,6 +121,11 @@ export function StudyDataProvider() {
   async function addSession(data: NewStudySession) {
     const created = await sessionsApi.insertSession(data)
     setSessions((prev) => [created, ...prev])
+  }
+
+  async function saveProfile(data: Profile) {
+    const saved = await profileApi.saveProfileRow(data)
+    setProfile(saved)
   }
 
   // Delete and status actions show failures in the banner instead
@@ -186,6 +202,7 @@ export function StudyDataProvider() {
         assignments,
         assessments,
         sessions,
+        profile,
         addModule,
         deleteModule,
         addAssignment,
@@ -197,6 +214,7 @@ export function StudyDataProvider() {
         deleteAssessment,
         addSession,
         deleteSession,
+        saveProfile,
       }}
     >
       {error && (
