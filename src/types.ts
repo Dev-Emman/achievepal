@@ -36,3 +36,11 @@ export type Assessment = {
 }
 
 export type NewAssessment = Omit<Assessment, 'id'>
+export type StudySession = {
+  id: string
+  moduleId: string | null
+  startedAt: string // ISO timestamp
+  durationSeconds: number
+}
+
+export type NewStudySession = Omit<StudySession, 'id'>
