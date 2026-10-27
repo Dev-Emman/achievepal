@@ -8,6 +8,7 @@ import {
   LogOut,
   Menu,
   Target,
+  Timer,
   X,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -49,6 +50,13 @@ const navItems = [
     to: '/grades',
     icon: Target,
     subtitle: 'Work out your marks and what you need to hit your target.',
+  },
+  {
+    label: 'Focus & Study Time',
+    short: 'Focus',
+    to: '/focus',
+    icon: Timer,
+    subtitle: 'Stay focused and keep track of your study sessions.',
   },
 ]
 

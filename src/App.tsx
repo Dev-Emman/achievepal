@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { StudyDataProvider } from './context/StudyDataContext'
+import { TimerProvider } from './context/TimerContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import PlaceholderPage from './components/PlaceholderPage'
@@ -9,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Assignments from './pages/Assignments'
 import Modules from './pages/Modules'
 import Grades from './pages/Grades'
+import Focus from './pages/Focus'
 
 function App() {
   return (
@@ -19,13 +21,16 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<StudyDataProvider />}>
-              <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/modules" element={<Modules />} />
-                <Route path="/assignments" element={<Assignments />} />
-                <Route path="/calendar" element={<PlaceholderPage title="Calendar" />} />
-                <Route path="/grades" element={<Grades />} />
-                <Route path="*" element={<PlaceholderPage title="Page not found" />} />
+              <Route element={<TimerProvider />}>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/modules" element={<Modules />} />
+                  <Route path="/assignments" element={<Assignments />} />
+                  <Route path="/calendar" element={<PlaceholderPage title="Calendar" />} />
+                  <Route path="/grades" element={<Grades />} />
+                  <Route path="/focus" element={<Focus />} />
+                  <Route path="*" element={<PlaceholderPage title="Page not found" />} />
+                </Route>
               </Route>
             </Route>
           </Route>

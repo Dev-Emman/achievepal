@@ -44,3 +44,20 @@ export function formatDate(iso: string): string {
     year: 'numeric',
   })
 }
+// "Today, 14:30", "Yesterday, 09:00", or "Mon 26 Oct, 09:00"
+export function whenLabel(isoTimestamp: string, now: Date = new Date()): string {
+  const d = new Date(isoTimestamp)
+  const time = d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  const diff = daysUntil(todayIso(d), now)
+  if (diff === 0) return `Today, ${time}`
+  if (diff === -1) return `Yesterday, ${time}`
+  const date = d.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+  return `${date}, ${time}`
+}

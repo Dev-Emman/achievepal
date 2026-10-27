@@ -69,8 +69,6 @@ export function StudyDataProvider() {
           setAssignments(loadedAssignments)
           setAssessments(loadedAssessments)
           setSessions(loadedSessions)
-          // TEMPORARY: delete this line after the check
-          console.log('Study sessions loaded:', loadedSessions.length)
         }
       )
       .catch((e: Error) => {
