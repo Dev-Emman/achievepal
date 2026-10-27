@@ -78,8 +78,6 @@ export function StudyDataProvider() {
           setAssessments(loadedAssessments)
           setSessions(loadedSessions)
           setProfile(loadedProfile)
-          // TEMPORARY: delete this line after the check
-          console.log('Profile loaded:', loadedProfile)
         }
       )
       .catch((e: Error) => {

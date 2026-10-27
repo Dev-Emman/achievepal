@@ -11,6 +11,7 @@ import Assignments from './pages/Assignments'
 import Modules from './pages/Modules'
 import Grades from './pages/Grades'
 import Focus from './pages/Focus'
+import Settings from './pages/Settings'
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
                   <Route path="/calendar" element={<PlaceholderPage title="Calendar" />} />
                   <Route path="/grades" element={<Grades />} />
                   <Route path="/focus" element={<Focus />} />
+                  <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<PlaceholderPage title="Page not found" />} />
                 </Route>
               </Route>

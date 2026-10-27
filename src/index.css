@@ -1318,3 +1318,25 @@ select:focus {
 .session-duration {
   font-weight: 700;
 }
+.settings-stack {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 720px;
+}
+
+.settings-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 600px) {
+  .settings-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+input[readonly] {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+}

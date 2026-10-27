@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Settings as SettingsIcon,
   Target,
   Timer,
   X,
@@ -58,8 +59,14 @@ const navItems = [
     icon: Timer,
     subtitle: 'Stay focused and keep track of your study sessions.',
   },
+  {
+    label: 'Settings',
+    short: 'Settings',
+    to: '/settings',
+    icon: SettingsIcon,
+    subtitle: 'Manage your account and study preferences.',
+  },
 ]
-
 // The pages shown in the phone bottom bar (everything else is under "More")
 const bottomPaths = ['/', '/modules', '/assignments', '/grades']
 const bottomItems = navItems.filter((item) => bottomPaths.includes(item.to))
