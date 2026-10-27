@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 import * as api from '../lib/api'
 import * as assessmentsApi from '../lib/assessmentsApi'
+import * as sessionsApi from '../lib/studySessionsApi'
 import type {
   Assessment,
   Assignment,
@@ -10,13 +11,16 @@ import type {
   NewAssessment,
   NewAssignment,
   NewModule,
+  NewStudySession,
   Status,
+  StudySession,
 } from '../types'
 
 type StudyData = {
   modules: Module[]
   assignments: Assignment[]
   assessments: Assessment[]
+  sessions: StudySession[]
   addModule: (data: NewModule) => Promise<void>
   deleteModule: (id: string) => Promise<void>
   addAssignment: (data: NewAssignment) => Promise<void>
@@ -26,6 +30,8 @@ type StudyData = {
   addAssessment: (data: NewAssessment) => Promise<void>
   setAssessmentMark: (id: string, mark: number | null) => Promise<void>
   deleteAssessment: (id: string) => Promise<void>
+  addSession: (data: NewStudySession) => Promise<void>
+  deleteSession: (id: string) => Promise<void>
 }
 
 const StudyDataContext = createContext<StudyData | null>(null)
@@ -37,6 +43,7 @@ export function StudyDataProvider() {
   const [modules, setModules] = useState<Module[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [assessments, setAssessments] = useState<Assessment[]>([])
+  const [sessions, setSessions] = useState<StudySession[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -48,13 +55,24 @@ export function StudyDataProvider() {
       api.fetchModules(),
       api.fetchAssignments(),
       assessmentsApi.fetchAssessments(),
+      sessionsApi.fetchSessions(),
     ])
-      .then(([loadedModules, loadedAssignments, loadedAssessments]) => {
-        if (cancelled) return
-        setModules(loadedModules)
-        setAssignments(loadedAssignments)
-        setAssessments(loadedAssessments)
-      })
+      .then(
+        ([
+          loadedModules,
+          loadedAssignments,
+          loadedAssessments,
+          loadedSessions,
+        ]) => {
+          if (cancelled) return
+          setModules(loadedModules)
+          setAssignments(loadedAssignments)
+          setAssessments(loadedAssessments)
+          setSessions(loadedSessions)
+          // TEMPORARY: delete this line after the check
+          console.log('Study sessions loaded:', loadedSessions.length)
+        }
+      )
       .catch((e: Error) => {
         if (!cancelled) setError(e.message)
       })
@@ -90,6 +108,12 @@ export function StudyDataProvider() {
     )
   }
 
+  // Newest first, matching the order the sessions are loaded in
+  async function addSession(data: NewStudySession) {
+    const created = await sessionsApi.insertSession(data)
+    setSessions((prev) => [created, ...prev])
+  }
+
   // Delete and status actions show failures in the banner instead
   async function deleteModule(id: string) {
     try {
@@ -97,6 +121,10 @@ export function StudyDataProvider() {
       setModules((prev) => prev.filter((m) => m.id !== id))
       setAssignments((prev) => prev.filter((a) => a.moduleId !== id))
       setAssessments((prev) => prev.filter((a) => a.moduleId !== id))
+      // Study sessions are kept; they just lose their module label
+      setSessions((prev) =>
+        prev.map((s) => (s.moduleId === id ? { ...s, moduleId: null } : s))
+      )
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong.')
     }
@@ -140,6 +168,15 @@ export function StudyDataProvider() {
     }
   }
 
+  async function deleteSession(id: string) {
+    try {
+      await sessionsApi.deleteSessionById(id)
+      setSessions((prev) => prev.filter((s) => s.id !== id))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.')
+    }
+  }
+
   if (loading) {
     return <p className="empty">Loading your data...</p>
   }
@@ -150,6 +187,7 @@ export function StudyDataProvider() {
         modules,
         assignments,
         assessments,
+        sessions,
         addModule,
         deleteModule,
         addAssignment,
@@ -159,6 +197,8 @@ export function StudyDataProvider() {
         addAssessment,
         setAssessmentMark,
         deleteAssessment,
+        addSession,
+        deleteSession,
       }}
     >
       {error && (
