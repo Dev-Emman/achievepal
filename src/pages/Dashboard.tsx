@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, ClipboardList, Target } from 'lucide-react'
+import GoalCard from '../components/GoalCard'
 import StatCard from '../components/StatCard'
 import UpcomingList from '../components/UpcomingList'
 import { useAuth } from '../context/AuthContext'
@@ -72,6 +73,8 @@ function Dashboard() {
           hint={overall === null ? 'Add marks in Grades' : 'Across your modules'}
         />
       </div>
+
+      <GoalCard />
 
       <UpcomingList assignments={assignments} onToggle={toggleAssignment} />
 

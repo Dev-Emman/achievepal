@@ -43,11 +43,16 @@ type ModuleGradesProps = {
 }
 
 function ModuleGrades({ mod }: ModuleGradesProps) {
-  const { assessments, addAssessment, setAssessmentMark, deleteAssessment } =
-    useStudyData()
+    const {
+    profile,
+    assessments,
+    addAssessment,
+    setAssessmentMark,
+    deleteAssessment,
+  } = useStudyData()
   const targetId = useId()
 
-  const [target, setTarget] = useState('70')
+  const [target, setTarget] = useState(String(profile.defaultTarget))
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
   const [weight, setWeight] = useState('')
